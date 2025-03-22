@@ -56,6 +56,7 @@ export const useUserStore = defineStore('user', {
       permissionStore.addRoutes = []
       // 刷新页面以重置路由
       location.reload()
+      // 111
     }
   }
 }) 
