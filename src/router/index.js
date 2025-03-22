@@ -64,5 +64,8 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
+console.log('测试');
+
+
 // 导出路由实例
 export default router 
