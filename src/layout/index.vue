@@ -100,6 +100,8 @@ const permissionStore = usePermissionStore()
 
 const activeMenu = computed(() => route.path)
 const isCollapse = ref(false)
+console.log('测试');
+
 
 // 过滤出一级菜单（首页和文章列表）
 const singleLevelRoutes = computed(() => {
