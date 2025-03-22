@@ -6,6 +6,8 @@ import { constantRoutes } from './routes'
 import { useUserStore } from '../stores/user'
 // 导入权限状态管理
 import { usePermissionStore } from '../stores/permission'
+// 导入ElMessage
+import { ElMessage } from 'element-plus'
 
 // 创建路由实例
 const router = createRouter({
@@ -20,46 +22,41 @@ const whiteList = ['/login']
 
 // 全局前置守卫
 router.beforeEach(async (to, from, next) => {
-  // 获取用户状态
   const userStore = useUserStore()
+  const permissionStore = usePermissionStore()
   
-  // 判断是否有token
   if (userStore.token) {
-    // 如果已登录，且要跳转的页面是登录页，则重定向到首页
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      // 获取权限状态
-      const permissionStore = usePermissionStore()
-      // 判断用户是否有角色，以及是否已经加载过动态路由
-      if (userStore.roles.length > 0 && permissionStore.addRoutes.length === 0) {
-        try {
-          // 根据角色生成可访问的路由表
+      try {
+        // 如果没有用户角色信息，获取用户信息
+        if (userStore.roles.length === 0) {
+          await userStore.getInfo()
+        }
+        
+        // 如果没有动态路由，生成路由
+        if (permissionStore.addRoutes.length === 0) {
           const accessRoutes = await permissionStore.generateRoutes(userStore.roles)
-          // 动态添加可访问路由表
           accessRoutes.forEach(route => {
             router.addRoute(route)
           })
-          // 设置 replace: true，这样导航就不会留下历史记录
-          next({ ...to, replace: true })
-        } catch (error) {
-          // 移除 token 并跳转登录页
-          userStore.logout()
-          next(`/login?redirect=${to.path}`)
+          // 重新进入当前路由
+          return next({ ...to, replace: true })
         }
-      } else {
-        // 已经加载过动态路由，直接放行
         next()
+      } catch (error) {
+        // 发生错误时清除token并重定向到登录页
+        await userStore.logout()
+        ElMessage.error(error.message || '路由守卫出错')
+        next('/login')
       }
     }
   } else {
-    // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
-      // 在免登录白名单中，直接进入
       next()
     } else {
-      // 否则全部重定向到登录页
-      next(`/login?redirect=${to.path}`)
+      next('/login')
     }
   }
 })

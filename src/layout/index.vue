@@ -89,7 +89,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Fold, ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { usePermissionStore } from '@/stores/permission'
 
@@ -126,10 +126,17 @@ const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value
 }
 
-const handleCommand = (command) => {
+const handleCommand = async (command) => {
   if (command === 'logout') {
-    userStore.logout()
-    router.push('/login')
+    try {
+      await userStore.logout()
+      router.push('/login')
+    } catch (error) {
+      console.error('登出失败:', error)
+      router.push('/login')
+    }
+  } else if (command === 'profile') {
+    router.push('/profile')
   }
 }
 </script>

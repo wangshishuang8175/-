@@ -62,6 +62,12 @@ export const usePermissionStore = defineStore('permission', {
         this.routes = constantRoutes.concat(accessedRoutes) // 合并基础路由和动态路由
         resolve(accessedRoutes)
       })
+    },
+
+    // 重置路由
+    resetRoutes() {
+      this.addRoutes = []
+      this.routes = []
     }
   }
 }) 

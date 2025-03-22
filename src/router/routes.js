@@ -95,7 +95,13 @@ export const asyncRoutes = [
         path: 'index',
         name: 'StatisticsIndex',
         component: () => import('../views/statistics/index.vue'),
-        meta: { title: '统计概览' }
+        meta: { title: '统计概览', roles: ['admin', 'super-admin'] }
+      },
+      {
+        path: 'analysis',
+        name: 'StatisticsAnalysis',
+        component: () => import('../views/statistics/analysis.vue'),
+        meta: { title: '数据分析', roles: ['super-admin'] }
       }
     ]
   },
